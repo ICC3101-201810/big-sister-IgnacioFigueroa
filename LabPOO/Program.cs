@@ -11,11 +11,30 @@ namespace LabPOO
     {
         public static List<Product> cart;
         public static List<Product> market;
-
+        public static List<Product> receta;
         static void Main(string[] args)
         {
+            Program p = new Program();
+            Candace += Chequear;
             cart = new List<Product>();
             market = new List<Product>();
+            receta = new List<Product>();
+            receta.Add(new Product("Láminas de Lasaña", 1250, 1, "400g"));
+            receta.Add(new Product("Queso Rallado Parmesano", 499, 2, "40g"));
+            receta.Add(new Product("Mantequilla", 850, 1, "125g"));
+            receta.Add(new Product("Carne Molida", 4390, 1, "500g"));
+            receta.Add(new Product("Vino Sauvignon Blanc Reserva Botella", 4150, 1, "750cc"));
+            receta.Add(new Product("Tomates Pelados en lata", 700, 1, "540g"));
+            receta.Add(new Product("Bolsa de Zanahorias", 890, 1, "1un"));
+            receta.Add(new Product("Malla de Cebollas", 1090, 1, "1kg"));
+            receta.Add(new Product("Aceite de Oliva", 1790, 1, "250g"));
+            receta.Add(new Product("Sal Lobos", 330, 1, "1kg"));
+            receta.Add(new Product("Pimienta", 430, 1, "15g"));
+            receta.Add(new Product("Harina", 890, 1 , "1kg"));
+            market.Add(new Product("Leche Entera", 820, 1, "1L"));
+
+
+
             SupplyStore();
             while (true)
             {
@@ -57,6 +76,10 @@ namespace LabPOO
             }
         }
 
+        public delegate void ChequearItem(Product item);
+
+        public static  event ChequearItem Candace;
+
         public static void Pay()
         {
             PrintHeader();
@@ -93,6 +116,7 @@ namespace LabPOO
                         continue;
                     }
                     AddToCart(market[answer]);
+                    OnChequearItem(market[answer]);
                     break;
                 }
                 catch
@@ -100,6 +124,14 @@ namespace LabPOO
                     continue;
                 }
             }           
+        }
+
+        protected static void OnChequearItem(Product product)
+        {
+            if (Candace != null)
+            {
+                Candace(product);   
+            }
         }
 
         public static void PrintCart()
@@ -166,11 +198,11 @@ namespace LabPOO
             Console.Clear();
             Console.WriteLine("\t\t===> Lasagne alla bolognese <===\n");
             Console.WriteLine("Ingredientes básicos:");
-            Console.WriteLine("\t12 láminas de Lasaña");
+            Console.WriteLine("\t12 láminas de Lasaña");       
             Console.WriteLine("\t70 gramos de parmesano rallado");
-            Console.WriteLine("\tMantequilla\n");
+            Console.WriteLine("\tMantequilla\n");           
             Console.WriteLine("Para el relleno:");
-            Console.WriteLine("\t300 gramos de carne picada (queda más jugosa con mezcla de cerdo y ternera)");
+            Console.WriteLine("\t300 gramos de carne picada (queda más jugosa con mezcla de cerdo y ternera)");            
             Console.WriteLine("\tMedio vaso de vino blanco");
             Console.WriteLine("\t250 gramos de tomate entero pelado de lata");
             Console.WriteLine("\t1 zanahoria");
@@ -190,6 +222,42 @@ namespace LabPOO
             {
                 response = Console.ReadKey(true);
             }
+        }
+
+        public static void Chequear(Product producto)
+        {
+            if (!receta.Contains(producto))
+            {
+                Console.WriteLine("Hermano estupido, eso no es necesario para la receta");
+                Console.WriteLine("Presiona una tecla para continuar");
+                Console.ReadKey();
+                cart.Remove(producto);
+            }
+
+            int counter = 0;
+            foreach(Product p in cart)
+            {
+                if (p.Name == producto.Name)
+                {
+                    counter += 1;
+                }
+
+                if (p.Name == )
+            }
+
+            foreach(Product p in receta)
+            {
+                if (p.Name == producto.Name)
+                {
+                    if (counter > p.Stock)
+                    {
+                        Console.WriteLine("Hermano estupido, ya no necesitamos más de eso");
+                        Console.WriteLine("Presiona una tecla para continuar");
+                        Console.ReadKey();
+                    }
+                }
+            }
+            
         }
     }
 }
