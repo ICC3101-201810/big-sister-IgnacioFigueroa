@@ -1,17 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.IO;
 
 namespace LabPOO
 {
+    [Serializable()]
     class Program
     {
         public static List<Product> cart;
         public static List<Product> market;
         public static List<Product> receta;
+
+        
+
         static void Main(string[] args)
         {
             Program p = new Program();
@@ -33,6 +39,17 @@ namespace LabPOO
             receta.Add(new Product("Harina", 890, 1 , "1kg"));
             market.Add(new Product("Leche Entera", 820, 1, "1L"));
 
+            try
+            {
+                using (Stream stream = File.Open("data.bin", FileMode.Open))
+                {
+                    BinaryFormatter bin = new BinaryFormatter();
+                    cart =(List<Product>) bin.Deserialize(stream);
+                }
+            }
+            catch (IOException)
+            {
+            }
 
 
             SupplyStore();
@@ -70,6 +87,18 @@ namespace LabPOO
                     }
                     else if (answer == "5")
                     {
+                        try
+                        {
+                            using (Stream stream = File.Open("data.bin", FileMode.Create))
+                            {
+                                BinaryFormatter bin = new BinaryFormatter();
+                                bin.Serialize(stream, cart);
+                            }
+                        }
+                        catch (IOException)
+                        {
+                        }
+                        
                         Environment.Exit(1);
                     }
                 }
@@ -226,13 +255,6 @@ namespace LabPOO
 
         public static void Chequear(Product producto)
         {
-            if (!receta.Contains(producto))
-            {
-                Console.WriteLine("Hermano estupido, eso no es necesario para la receta");
-                Console.WriteLine("Presiona una tecla para continuar");
-                Console.ReadKey();
-                cart.Remove(producto);
-            }
 
             int counter = 0;
             foreach(Product p in cart)
@@ -242,18 +264,37 @@ namespace LabPOO
                     counter += 1;
                 }
 
-                if (p.Name == )
             }
+            int counter2 = 0;
 
             foreach(Product p in receta)
             {
                 if (p.Name == producto.Name)
                 {
+                    counter2 += 1;
+                }
+            }
+
+            if (counter2 == 0)
+            {
+                Console.WriteLine("Hermano estupido, eso no es necesario para la receta");
+                Console.WriteLine("Presiona una tecla para continuar");
+                Console.ReadKey();
+                cart.Remove(producto);
+                return;
+            }
+
+            foreach (Product p in receta)
+            {
+                if (p.Name == producto.Name)
+                {
+
                     if (counter > p.Stock)
                     {
                         Console.WriteLine("Hermano estupido, ya no necesitamos más de eso");
                         Console.WriteLine("Presiona una tecla para continuar");
                         Console.ReadKey();
+                        cart.Remove(producto);
                     }
                 }
             }
